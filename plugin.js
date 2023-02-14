@@ -81,8 +81,6 @@ export class Plugin {
    * @param {*} extras
    */
   async sendMessage(type, data, extras) {
-    return this.queue.postMessage(
-      this.make(`${this.name}.${type}`, data, extras)
-    );
+    return this.queue.postMessage(this.make(type, data, extras));
   }
 }
