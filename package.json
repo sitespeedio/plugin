@@ -1,6 +1,7 @@
 {
   "name": "@sitespeed.io/plugin",
   "version": "0.0.1",
+  "type": "module",
   "description": "Plugin base class, use it to create your own plugin",
   "exports": "./plugin.js",
   "files": [
