@@ -4,9 +4,9 @@
  *
  * https://www.sitespeed.io/documentation/sitespeed.io/plugins/#how-to-create-your-own-plugin
  */
-export class Plugin {
+export class SitespeedioPlugin {
   constructor(config) {
-    if (this.constructor == Plugin) {
+    if (this.constructor == SitespeedioPlugin) {
       throw new Error("Abstract plugin can't be instantiated.");
     }
     if (config.name.includes('.')) {
@@ -16,14 +16,18 @@ export class Plugin {
     this.options = config.options;
     this.context = config.context;
     this.queue = config.queue;
-    this.make = config.context.make;
     this.make = config.context.messageMaker(this.name).make;
+    this.log = config.context.intel.getLogger(this.name);
   }
 
   /**
-   * Get the name of the plugin
-   * @returns name of the plugin
+   * @param {*} message
+   * @param {*} level - trace | verbose | debug | info | warn | error | critical
    */
+  log(message, level = 'info') {
+    this.log[level](message);
+  }
+
   getName() {
     return this.name;
   }
