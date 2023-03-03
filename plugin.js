@@ -21,13 +21,18 @@ export class SitespeedioPlugin {
   }
 
   /**
+   * Log a message. Default log level is info.
    * @param {*} message
-   * @param {*} level - trace | verbose | debug | info | warn | error | critical
+   * @param {*} level - trace|verbose|debug|info|warn|error|critical
    */
   log(message, level = 'info') {
     this.log[level](message);
   }
 
+  /**
+   * Get the name of the plugin.
+   * @returns
+   */
   getName() {
     return this.name;
   }
@@ -40,25 +45,24 @@ export class SitespeedioPlugin {
     return this.options;
   }
 
+  /**
+   * Gets the sitespeed.io context object.
+   * @returns {Object} The sitespeed.io context object.
+   */
   getContext() {
     return this.context;
   }
 
   /**
-   * Get the queue used for sending messages.
-   * @returns
+   * Gets the storage manager used to store data.
+   * @returns {StorageManager} The storage manager used to store data.
    */
-  getQueue() {
-    return this.queue;
-  }
-
   getStorageManager() {
     return this.context.storageManager;
   }
 
   /**
-   * When sitespeed.io starts up, it calls every configured plugin using the
-   * open function.
+   * Called when sitespeed.io starts up. Override this method to perform any setup tasks.
    */
   async open() {}
 
@@ -74,12 +78,12 @@ export class SitespeedioPlugin {
   }
 
   /**
-   * When sitespeed.io closes down, it calls every configured plugins close methos.
+   * Called when sitespeed.io shuts down. Override this method to perform any cleanup tasks.
    */
   async close() {}
 
   /**
-   * Send a message on the queue.
+   * Sends a message on the message queue.
    * @param {} type
    * @param {*} data
    * @param {*} extras
