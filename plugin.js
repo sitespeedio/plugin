@@ -18,7 +18,7 @@ export class SitespeedioPlugin {
     this.queue = config.queue;
     this.make = config.context.messageMaker(this.name).make;
     this.log = config.context.intel.getLogger(
-      `sitespeed.io.plugin.${this.name}`
+      `sitespeed.io.plugin.${config.name}`
     );
   }
 
@@ -27,12 +27,24 @@ export class SitespeedioPlugin {
    * @param {*} message
    * @param {*} level - trace|verbose|debug|info|warn|error|critical
    */
-  log(message, level = 'info') {
-    this.log[level](message);
+  log(message, level = 'info', ...args) {
+    this.log[level](message, args);
   }
 
+  /**
+   * Get the log instance.
+   */
   getLog() {
     return this.log;
+  }
+
+  /**
+   * Get the filter registry so you can configure what metrics you want to send
+   * to the TimeSeries database
+   * @returns
+   */
+  getFilterRegistry() {
+    return this.context.filterRegistry;
   }
 
   /**
