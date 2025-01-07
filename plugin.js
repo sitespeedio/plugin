@@ -17,7 +17,7 @@ export class SitespeedioPlugin {
     this.context = config.context;
     this.queue = config.queue;
     this.make = config.context.messageMaker(this.name).make;
-    this.log = config.context.intel.getLogger(
+    this.log = config.context.getLogger(
       `sitespeed.io.plugin.${config.name}`
     );
   }
