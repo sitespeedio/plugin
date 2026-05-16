@@ -21,6 +21,8 @@ export class SitespeedioPlugin {
     this.options = config.options;
     this.context = config.context;
     this.queue = config.queue;
+    // Build a message tagged with this plugin's name.
+    // Usage: this.make(type, data, extras). sendMessage() uses this under the hood.
     this.make = config.context.messageMaker(this.name).make;
     // Logger instance. Call levels directly, e.g. this.log.info(msg).
     // Levels: trace|verbose|debug|info|warn|error|critical
@@ -98,9 +100,9 @@ export class SitespeedioPlugin {
 
   /**
    * Sends a message on the message queue.
-   * @param {} type
-   * @param {*} data
-   * @param {*} extras
+   * @param {string} type - Message type (e.g. 'myplugin.data').
+   * @param {*} [data] - Message payload.
+   * @param {*} [extras] - Optional extras carried alongside the message.
    */
   async sendMessage(type, data, extras) {
     return this.queue.postMessage(this.make(type, data, extras));
