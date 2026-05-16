@@ -64,17 +64,19 @@ test('rejects plugin names containing a dot', () => {
 test('rejects config missing required fields', () => {
   assert.throws(() => new TestPlugin(), /requires a config object/);
   assert.throws(
-    () => new TestPlugin({ context: makeContext(), queue: makeQueue() }),
+    () => new TestPlugin({ context: makeContext() }),
     /requires a config object/
   );
   assert.throws(
-    () => new TestPlugin({ name: 'p', queue: makeQueue() }),
+    () => new TestPlugin({ name: 'p' }),
     /requires a config object/
   );
-  assert.throws(
-    () => new TestPlugin({ name: 'p', context: makeContext() }),
-    /requires a config object/
-  );
+});
+
+test('accepts config without a queue (queue is optional at construction)', () => {
+  const plugin = new TestPlugin({ name: 'noqueue', context: makeContext() });
+  assert.equal(plugin.getName(), 'noqueue');
+  assert.equal(plugin.queue, undefined);
 });
 
 test('getters return the values passed in via config', () => {

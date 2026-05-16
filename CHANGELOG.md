@@ -1,5 +1,15 @@
 # CHANGELOG - sitespeed.io/plugin  (we use [semantic versioning](https://semver.org))
 
+## 1.0.2 - UNRELEASED
+### Fixed
+* Relaxed the config validation introduced in 1.0.1 so that `queue` is no
+  longer required at construction time. Existing plugins like `pagexray`
+  call `super({ name, options, context })` without a `queue`, which broke
+  in 1.0.1 with `SitespeedioPlugin requires a config object with name,
+  context and queue`. The constructor now only requires `name` and
+  `context`; `queue` is consumed later by `sendMessage()` and may be set
+  by the framework after construction.
+
 ## 1.0.1 - 2025-05-16
 ### Fixed
 * Removed an unreachable `log()` wrapper method on the base class. The

@@ -9,9 +9,9 @@ export class SitespeedioPlugin {
     if (this.constructor === SitespeedioPlugin) {
       throw new Error("Abstract plugin can't be instantiated.");
     }
-    if (!config || !config.name || !config.context || !config.queue) {
+    if (!config || !config.name || !config.context) {
       throw new Error(
-        'SitespeedioPlugin requires a config object with name, context and queue'
+        'SitespeedioPlugin requires a config object with name and context'
       );
     }
     if (config.name.includes('.')) {
