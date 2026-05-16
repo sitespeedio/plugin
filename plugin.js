@@ -6,8 +6,13 @@
  */
 export class SitespeedioPlugin {
   constructor(config) {
-    if (this.constructor == SitespeedioPlugin) {
+    if (this.constructor === SitespeedioPlugin) {
       throw new Error("Abstract plugin can't be instantiated.");
+    }
+    if (!config || !config.name || !config.context || !config.queue) {
+      throw new Error(
+        'SitespeedioPlugin requires a config object with name, context and queue'
+      );
     }
     if (config.name.includes('.')) {
       throw new Error("sitespeed.io plugin names can't contain dots");
@@ -17,18 +22,9 @@ export class SitespeedioPlugin {
     this.context = config.context;
     this.queue = config.queue;
     this.make = config.context.messageMaker(this.name).make;
-    this.log = config.context.getLogger(
-      `sitespeed.io.plugin.${config.name}`
-    );
-  }
-
-  /**
-   * Log a message. Default log level is info.
-   * @param {*} message
-   * @param {*} level - trace|verbose|debug|info|warn|error|critical
-   */
-  log(message, level = 'info', ...args) {
-    this.log[level](message, args);
+    // Logger instance. Call levels directly, e.g. this.log.info(msg).
+    // Levels: trace|verbose|debug|info|warn|error|critical
+    this.log = config.context.getLogger(`sitespeed.io.plugin.${config.name}`);
   }
 
   /**
