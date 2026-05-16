@@ -11,7 +11,8 @@
   ],
   "scripts": {
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "node --test"
   },
   "keywords": [
     "sitespeed.io",
@@ -23,6 +24,9 @@
     "url": "https://github.com/sitespeedio/plugin.git"
   },
   "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "devDependencies": {
     "eslint": "8.34.0",
     "eslint-config-prettier": "8.6.0",
