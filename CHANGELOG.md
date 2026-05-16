@@ -1,6 +1,6 @@
 # CHANGELOG - sitespeed.io/plugin  (we use [semantic versioning](https://semver.org))
 
-## 1.0.1 - UNRELEASED
+## 1.0.1 - 2025-05-16
 ### Fixed
 * Removed an unreachable `log()` wrapper method on the base class. The
   constructor's `this.log` assignment had always shadowed it, so calling
