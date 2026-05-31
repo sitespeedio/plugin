@@ -1,6 +1,6 @@
 # CHANGELOG - sitespeed.io/plugin  (we use [semantic versioning](https://semver.org))
 
-## 1.0.2 - UNRELEASED
+## 1.0.2 - 2026-05-16
 ### Fixed
 * Relaxed the config validation introduced in 1.0.1 so that `queue` is no
   longer required at construction time. Existing plugins like `pagexray`

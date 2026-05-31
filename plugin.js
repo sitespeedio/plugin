@@ -1,4 +1,46 @@
 /**
+ * @typedef {Object} Logger
+ * @property {Function} trace
+ * @property {Function} verbose
+ * @property {Function} debug
+ * @property {Function} info
+ * @property {Function} warn
+ * @property {Function} error
+ * @property {Function} critical
+ */
+
+/**
+ * @typedef {Object} MessageMaker
+ * @property {Function} make - Build a message tagged with the maker's plugin name. Signature: `make(type, data?, extras?)`.
+ */
+
+/**
+ * A message on the sitespeed.io queue. Produced by `context.messageMaker(name).make(...)`.
+ *
+ * @typedef {Object} QueueMessage
+ * @property {string}  type        - Message type (e.g. 'browsertime.run', 'sitespeedio.render').
+ * @property {*}       [data]      - Message payload.
+ * @property {*}       [extras]    - Optional extras carried alongside the message.
+ * @property {string}  [url]       - URL this message relates to, if any.
+ * @property {number}  [runIndex]  - Run index, if the message belongs to a specific run.
+ * @property {string}  [source]    - Name of the plugin that produced the message.
+ * @property {string}  [uuid]      - Set by the queue handler when the message is enqueued.
+ */
+
+/**
+ * The sitespeed.io context object, passed to your plugin's constructor and to
+ * `open()`. Provides framework services: logging, storage, filter/metrics
+ * registry, and the URL helpers used to build links into the result folder.
+ *
+ * @typedef {Object} SitespeedioContext
+ * @property {function(string): MessageMaker} messageMaker - Factory that returns a maker tagged with the given plugin name.
+ * @property {function(string): Logger}       getLogger    - Factory for a named logger.
+ * @property {Object} filterRegistry  - Registry that lets plugins declare which metrics to forward to TimeSeries databases.
+ * @property {Object} storageManager  - Used to write files (HTML report, JSON dumps, …) under the result folder.
+ * @property {Object} resultUrls      - Helpers for building URLs that point into the result folder.
+ */
+
+/**
  * Base class that you can extend when you build a sitespeed.io plugin.
  * Your class will be instantiated by sitespeed.io.
  *
@@ -90,8 +132,8 @@ export class SitespeedioPlugin {
    * sitespeed.io invokes it with `(context, options)` — the same objects passed to
    * the constructor. They are passed again for backwards compatibility; you can
    * also read them via `this.context` / `this.options`.
-   * @param {Object} [context] - sitespeed.io context (same as constructor `context`).
-   * @param {Object} [options] - sitespeed.io options (same as constructor `options`).
+   * @param {SitespeedioContext} [context] - sitespeed.io context (same as constructor `context`).
+   * @param {Object}             [options] - sitespeed.io options (same as constructor `options`).
    */
   // eslint-disable-next-line no-unused-vars
   async open(context, options) {}
@@ -108,8 +150,8 @@ export class SitespeedioPlugin {
    *   - 'sitespeedio.prepareToRender' — about to render output
    *   - 'sitespeedio.render'          — write final output to storage
    *
-   * @param {Object} message - Message from the queue (has `type`, optional `data`, `url`, `runIndex`, …).
-   * @param {Object} [queue] - The queue handler (same as `this.queue`).
+   * @param {QueueMessage} message - Message from the queue.
+   * @param {Object}       [queue] - The queue handler (same as `this.queue`).
    */
   // eslint-disable-next-line no-unused-vars
   async processMessage(message, queue) {
