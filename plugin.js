@@ -5,6 +5,14 @@
  * https://www.sitespeed.io/documentation/sitespeed.io/plugins/#how-to-create-your-own-plugin
  */
 export class SitespeedioPlugin {
+  /**
+   * Optional. Set as a class field on your subclass (e.g. `concurrency = 1`)
+   * to limit how many messages this plugin processes in parallel. Read by
+   * sitespeed.io's queue handler; when unset the plugin is unlimited.
+   * @type {number|undefined}
+   */
+  // concurrency;
+
   constructor(config) {
     if (this.constructor === SitespeedioPlugin) {
       throw new Error("Abstract plugin can't be instantiated.");
@@ -79,24 +87,43 @@ export class SitespeedioPlugin {
 
   /**
    * Called when sitespeed.io starts up. Override this method to perform any setup tasks.
+   * sitespeed.io invokes it with `(context, options)` — the same objects passed to
+   * the constructor. They are passed again for backwards compatibility; you can
+   * also read them via `this.context` / `this.options`.
+   * @param {Object} [context] - sitespeed.io context (same as constructor `context`).
+   * @param {Object} [options] - sitespeed.io options (same as constructor `options`).
    */
-  async open() {}
+  // eslint-disable-next-line no-unused-vars
+  async open(context, options) {}
 
   /**
    * Sitespeed.io and plugins talk to each other using the messages in the
-   * message queue.
+   * message queue. Override this method to react to messages. sitespeed.io
+   * invokes it with `(message, queue)`; `queue` is the same queue handler
+   * available via `this.queue`.
    *
-   * @param {*} message
+   * Common lifecycle message types you may want to handle:
+   *   - 'sitespeedio.setup'           — plugins announce themselves / register filters
+   *   - 'sitespeedio.summarize'       — all analysis done, time to summarize
+   *   - 'sitespeedio.prepareToRender' — about to render output
+   *   - 'sitespeedio.render'          — write final output to storage
+   *
+   * @param {Object} message - Message from the queue (has `type`, optional `data`, `url`, `runIndex`, …).
+   * @param {Object} [queue] - The queue handler (same as `this.queue`).
    */
   // eslint-disable-next-line no-unused-vars
-  async processMessage(message) {
+  async processMessage(message, queue) {
     throw new Error("Method 'processMessage()' must be implemented.");
   }
 
   /**
    * Called when sitespeed.io shuts down. Override this method to perform any cleanup tasks.
+   * sitespeed.io invokes it with `(options, errors)`.
+   * @param {Object} [options] - sitespeed.io options.
+   * @param {Array}  [errors]  - Errors collected during the run.
    */
-  async close() {}
+  // eslint-disable-next-line no-unused-vars
+  async close(options, errors) {}
 
   /**
    * Sends a message on the message queue.

@@ -25,3 +25,91 @@ jobs:
       run: npm run lint
     - name: Run unit tests
       run: npm test
+
+  # Canary: install this branch into sitespeed.io@main and run its lint + unit
+  # tests. Catches base-class signature/import breakage across the ~25 built-in
+  # plugins. Browser-driver downloads are skipped so the job stays cheap (~2 min).
+  compat-sitespeed-io:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Check out this plugin
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      with:
+        path: plugin
+    - name: Use Node.js 22
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      with:
+        node-version: '22.x'
+    - name: Pack this plugin
+      working-directory: plugin
+      run: |
+        npm ci
+        npm pack
+        echo "PLUGIN_TARBALL=$GITHUB_WORKSPACE/plugin/$(ls *.tgz)" >> "$GITHUB_ENV"
+    - name: Check out sitespeed.io@main
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      with:
+        repository: sitespeedio/sitespeed.io
+        ref: main
+        path: sitespeed.io
+    - name: Install sitespeed.io
+      working-directory: sitespeed.io
+      env:
+        CHROMEDRIVER_SKIP_DOWNLOAD: true
+        GECKODRIVER_SKIP_DOWNLOAD: true
+      run: npm ci
+    - name: Override @sitespeed.io/plugin with this branch
+      working-directory: sitespeed.io
+      env:
+        CHROMEDRIVER_SKIP_DOWNLOAD: true
+        GECKODRIVER_SKIP_DOWNLOAD: true
+      run: npm install --no-save "$PLUGIN_TARBALL"
+    - name: Lint sitespeed.io
+      working-directory: sitespeed.io
+      run: npm run lint
+    - name: Run sitespeed.io unit tests
+      working-directory: sitespeed.io
+      run: npm test
+
+  # Smoke: actually run one sitespeed.io invocation against a local URL with
+  # this branch's plugin swapped in. Exercises the full plugin lifecycle
+  # (constructor + open + processMessage for setup/summarize/prepareToRender/
+  # render + close) against the real framework, with a real browser.
+  smoke-sitespeed-io:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Check out this plugin
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      with:
+        path: plugin
+    - name: Use Node.js 22
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      with:
+        node-version: '22.x'
+    - name: Pack this plugin
+      working-directory: plugin
+      run: |
+        npm ci
+        npm pack
+        echo "PLUGIN_TARBALL=$GITHUB_WORKSPACE/plugin/$(ls *.tgz)" >> "$GITHUB_ENV"
+    - name: Check out sitespeed.io@main
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      with:
+        repository: sitespeedio/sitespeed.io
+        ref: main
+        path: sitespeed.io
+    - name: Install scipy (used by sitespeed.io stats)
+      run: |
+        python -m pip install --upgrade --user pip
+        python -m pip install --user scipy
+    - name: Install sitespeed.io (with browser drivers)
+      working-directory: sitespeed.io
+      run: npm ci
+    - name: Override @sitespeed.io/plugin with this branch
+      working-directory: sitespeed.io
+      run: npm install --no-save "$PLUGIN_TARBALL"
+    - name: Run a single sitespeed.io test with this plugin
+      working-directory: sitespeed.io
+      run: bin/sitespeed.js -n 1 -b chrome --xvfb --outputFolder /tmp/sitespeed-result https://www.sitespeed.io/
+    - name: Verify HTML report was produced
+      run: test -f /tmp/sitespeed-result/index.html
